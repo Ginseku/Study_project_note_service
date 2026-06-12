@@ -16,5 +16,9 @@ public class NotesController {
         return "note deleted";
     }
 
+    @GetMapping
+    public String getMyNotes(){
+        return "My list of notes";
+    }
 
 }
