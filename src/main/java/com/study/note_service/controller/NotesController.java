@@ -4,7 +4,7 @@ import com.study.note_service.DTO.request.CreateNotesRequest;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
-@RequestMapping("/notes")
+@RequestMapping("/notes") //could use if we have Bearer token
 public class NotesController {
 
     @PostMapping("/create")
