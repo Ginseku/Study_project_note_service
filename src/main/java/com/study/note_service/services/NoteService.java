@@ -1,7 +1,7 @@
 package com.study.note_service.services;
 
 import com.study.note_service.DTO.request.CreateNotesRequest;
-import com.study.note_service.NotesRepository;
+import com.study.note_service.repository.NotesRepository;
 import com.study.note_service.entity.NotesEntity;
 import org.springframework.stereotype.Service;
 
