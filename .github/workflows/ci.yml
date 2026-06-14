@@ -15,6 +15,10 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
+    env:
+    JWT_SECRET: ${{ secrets.JWT_SECRET }}
+    JWT_EXPIRATION: ${{ secrets.JWT_EXPIRATION }}
+
     services:
       postgres:
         image: postgres:17
