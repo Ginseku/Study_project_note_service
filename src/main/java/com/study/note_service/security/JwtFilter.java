@@ -30,18 +30,20 @@ public class JwtFilter extends OncePerRequestFilter {
 
         String header = request.getHeader("Authorization");
 
+        // 1. Если нет токена — просто пропускаем дальше
         if (header == null || !header.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
             return;
         }
 
         try {
+            // 2. Достаём токен
             String token = header.substring(7);
 
-            Claims claims = jwtService.extractClaims(token);
+            // 3. Достаём userId из JWT через сервис
+            Long userId = jwtService.extractUserId(token);
 
-            Long userId = claims.get("userId", Long.class);
-
+            // 4. Создаём Authentication объект
             UsernamePasswordAuthenticationToken auth =
                     new UsernamePasswordAuthenticationToken(
                             userId,
@@ -49,20 +51,15 @@ public class JwtFilter extends OncePerRequestFilter {
                             Collections.emptyList()
                     );
 
+            // 5. Кладём в SecurityContext
             SecurityContextHolder.getContext().setAuthentication(auth);
 
-        } catch (Exception ex) {
-            filterChain.doFilter(request, response);
-            return;
-        }
-
-        filterChain.doFilter(request, response);
-    }
-
+        } catch (Exception e) {
+            // если токен битый — просто не аутентифицируем
             SecurityContextHolder.clearContext();
-
         }
 
+        // 6. продолжаем цепочку
         filterChain.doFilter(request, response);
     }
 }
