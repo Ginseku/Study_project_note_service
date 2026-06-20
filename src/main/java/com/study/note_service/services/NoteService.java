@@ -14,8 +14,9 @@ public class NoteService {
         this.notesRepository = notesRepository;
     }
 
-    public void createNote(CreateNotesRequest request){
+    public void createNote(CreateNotesRequest request, Long userId){
         NotesEntity note = new NotesEntity();
+        note.setUserId(userId);
         note.setTitle(request.title());
         note.setContent(request.content());
         notesRepository.save(note);

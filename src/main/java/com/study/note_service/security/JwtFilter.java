@@ -8,7 +8,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
@@ -29,38 +28,38 @@ public class JwtFilter extends OncePerRequestFilter {
             FilterChain filterChain
     ) throws ServletException, IOException {
 
-        String authHeader = request.getHeader("Authorization");
+        String header = request.getHeader("Authorization");
 
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+        // 1. Если нет токена — просто пропускаем дальше
+        if (header == null || !header.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
             return;
         }
 
-        String token = authHeader.substring(7);
-
         try {
+            // 2. Достаём токен
+            String token = header.substring(7);
 
+            // 3. Достаём userId из JWT через сервис
             Long userId = jwtService.extractUserId(token);
 
-            request.setAttribute("userId", userId);
-
-            Authentication authentication =
+            // 4. Создаём Authentication объект
+            UsernamePasswordAuthenticationToken auth =
                     new UsernamePasswordAuthenticationToken(
                             userId,
                             null,
                             Collections.emptyList()
                     );
 
-            SecurityContextHolder
-                    .getContext()
-                    .setAuthentication(authentication);
+            // 5. Кладём в SecurityContext
+            SecurityContextHolder.getContext().setAuthentication(auth);
 
-        } catch (Exception ex) {
-
+        } catch (Exception e) {
+            // если токен битый — просто не аутентифицируем
             SecurityContextHolder.clearContext();
-
         }
 
+        // 6. продолжаем цепочку
         filterChain.doFilter(request, response);
     }
 }
